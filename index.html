@@ -506,7 +506,7 @@
   <div class="header">
     <div class="header-badge">Ingeniería de Sistemas</div>
     <h1>Registro de<br>Recuperaciones</h1>
-    <p>Completá el formulario para programar tu clase de recuperación y notificar a tus estudiantes.</p>
+    <p>Complete el formulario para programar su clase de recuperación.</p>
   </div>
 
   <!-- Card principal -->
@@ -530,8 +530,8 @@
 
     <!-- Panel 1: Docente -->
     <div class="panel active" id="panel-1">
-      <div class="panel-title">¿Quién sos?</div>
-      <div class="panel-sub">Escribí tu nombre para ver tus materias asignadas.</div>
+      <div class="panel-title">Ingrese su nombre</div>
+      <div class="panel-sub">Ingrese su nombre para ver sus materias asignadas.</div>
 
       <div id="msg-1" class="msg"></div>
       <div id="loading-1" class="loading">
@@ -542,7 +542,7 @@
       <div class="field">
         <label>Nombre del docente</label>
         <div class="autocomplete-wrap">
-          <input type="text" id="inp-docente" placeholder="Escribí tu nombre..." autocomplete="off" disabled>
+          <input type="text" id="inp-docente" placeholder="Escriba su nombre..." autocomplete="off" disabled>
           <div class="autocomplete-list" id="autocomplete-list"></div>
         </div>
       </div>
@@ -554,8 +554,8 @@
 
     <!-- Panel 2: Materia -->
     <div class="panel" id="panel-2">
-      <div class="panel-title">¿Qué materia?</div>
-      <div class="panel-sub">Seleccioná la materia que necesitás recuperar.</div>
+      <div class="panel-title">Seleccione la materia</div>
+      <div class="panel-sub">Seleccione la materia que necesite recuperar.</div>
 
       <div id="msg-2" class="msg"></div>
       <div id="loading-2" class="loading">
@@ -574,8 +574,8 @@
 
     <!-- Panel 3: Fechas -->
     <div class="panel" id="panel-3">
-      <div class="panel-title">¿Cuándo?</div>
-      <div class="panel-sub">Confirmá los datos y elegí las fechas.</div>
+      <div class="panel-title">Seleccione la fecha</div>
+      <div class="panel-sub">Confirme los datos y sleccione las fechas.</div>
 
       <div id="msg-3" class="msg"></div>
 
@@ -666,9 +666,9 @@
         if (!json.ok) throw new Error(json.error);
         todosDocentes = json.docentes;
         document.getElementById("inp-docente").disabled = false;
-        document.getElementById("inp-docente").placeholder = "Escribí tu nombre...";
+        document.getElementById("inp-docente").placeholder = "Escriba su nombre...";
       } catch (err) {
-        mostrarMsg(1, "No se pudo cargar la lista de docentes. Intentá recargar la página.", "error");
+        mostrarMsg(1, "No se pudo cargar la lista de docentes. Intente recargar la página.", "error");
       } finally {
         setLoading(1, false);
       }
@@ -822,11 +822,11 @@
       const fechaRecuperacion = document.getElementById("inp-fecha-recuperacion").value;
 
       if (!fechaFaltada) {
-        mostrarMsg(3, "Por favor ingresá la fecha de clase faltada.", "error");
+        mostrarMsg(3, "Por favor ingrese la fecha de clase faltada.", "error");
         return;
       }
       if (!fechaRecuperacion) {
-        mostrarMsg(3, "Por favor ingresá la fecha de recuperación.", "error");
+        mostrarMsg(3, "Por favor ingrese la fecha de recuperación.", "error");
         return;
       }
       if (fechaRecuperacion <= fechaFaltada) {
