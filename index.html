@@ -456,6 +456,43 @@
       100% { transform: scale(1);   opacity: 1; }
     }
 
+    /* ── Autocomplete ──────────────────────────────────────── */
+    .autocomplete-wrap {
+      position: relative;
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0; right: 0;
+      background: var(--white);
+      border: 1.5px solid var(--gold);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(26,18,9,0.12);
+      z-index: 100;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .autocomplete-list.open { display: block; }
+
+    .autocomplete-item {
+      padding: 11px 16px;
+      font-size: 15px;
+      color: var(--dark);
+      cursor: pointer;
+      transition: background 0.15s;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .autocomplete-item:last-child { border-bottom: none; }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.highlighted {
+      background: var(--gold-pale);
+    }
+
     /* ── Responsive ────────────────────────────────────────── */
     @media (max-width: 480px) {
       .panel { padding: 24px 20px 20px; }
@@ -494,7 +531,7 @@
     <!-- Panel 1: Docente -->
     <div class="panel active" id="panel-1">
       <div class="panel-title">¿Quién sos?</div>
-      <div class="panel-sub">Seleccioná tu nombre de la lista para ver tus materias asignadas.</div>
+      <div class="panel-sub">Escribí tu nombre para ver tus materias asignadas.</div>
 
       <div id="msg-1" class="msg"></div>
       <div id="loading-1" class="loading">
@@ -504,14 +541,10 @@
 
       <div class="field">
         <label>Nombre del docente</label>
-        <select id="sel-docente" disabled>
-          <option value="">Cargando...</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Correo institucional</label>
-        <input type="email" id="inp-correo" placeholder="docente@prueba.edu.bo">
+        <div class="autocomplete-wrap">
+          <input type="text" id="inp-docente" placeholder="Escribí tu nombre..." autocomplete="off" disabled>
+          <div class="autocomplete-list" id="autocomplete-list"></div>
+        </div>
       </div>
 
       <button class="btn btn-primary" id="btn-1" onclick="irPaso2()" disabled>
@@ -621,25 +654,19 @@
       actualizarStepper(num);
     }
 
-    // ── Paso 1: cargar docentes ───────────────────────────────
+    // ── Paso 1: cargar docentes + autocomplete ────────────────
+    let todosDocentes = [];
+    let docenteSeleccionado = "";
+
     async function cargarDocentes() {
       setLoading(1, true);
       try {
         const res  = await fetch(`${API}?accion=docentes`);
         const json = await res.json();
-
         if (!json.ok) throw new Error(json.error);
-
-        const sel = document.getElementById("sel-docente");
-        sel.innerHTML = `<option value="">Seleccioná tu nombre...</option>`;
-        json.docentes.forEach(d => {
-          const opt = document.createElement("option");
-          opt.value = d;
-          opt.textContent = d;
-          sel.appendChild(opt);
-        });
-        sel.disabled = false;
-
+        todosDocentes = json.docentes;
+        document.getElementById("inp-docente").disabled = false;
+        document.getElementById("inp-docente").placeholder = "Escribí tu nombre...";
       } catch (err) {
         mostrarMsg(1, "No se pudo cargar la lista de docentes. Intentá recargar la página.", "error");
       } finally {
@@ -647,27 +674,58 @@
       }
     }
 
-    // Habilitar botón cuando hay docente y correo
-    document.getElementById("sel-docente").addEventListener("change", validarPaso1);
-    document.getElementById("inp-correo").addEventListener("input", validarPaso1);
+    const inpDocente      = document.getElementById("inp-docente");
+    const autocompleteList = document.getElementById("autocomplete-list");
 
-    function validarPaso1() {
-      const docente = document.getElementById("sel-docente").value;
-      const correo  = document.getElementById("inp-correo").value.trim();
-      const valido  = docente !== "" && correo !== "" && correo.includes("@");
-      document.getElementById("btn-1").disabled = !valido;
+    inpDocente.addEventListener("input", () => {
+      const val = inpDocente.value.trim().toLowerCase();
+      docenteSeleccionado = "";
+      document.getElementById("btn-1").disabled = true;
       limpiarMsg(1);
-    }
+
+      if (val.length < 1) {
+        autocompleteList.classList.remove("open");
+        return;
+      }
+
+      const filtrados = todosDocentes.filter(d => d.toLowerCase().includes(val));
+
+      if (filtrados.length === 0) {
+        autocompleteList.classList.remove("open");
+        return;
+      }
+
+      autocompleteList.innerHTML = filtrados.map(d =>
+        `<div class="autocomplete-item" data-nombre="${d}">${d}</div>`
+      ).join("");
+
+      autocompleteList.querySelectorAll(".autocomplete-item").forEach(item => {
+        item.addEventListener("click", () => {
+          inpDocente.value     = item.dataset.nombre;
+          docenteSeleccionado  = item.dataset.nombre;
+          autocompleteList.classList.remove("open");
+          document.getElementById("btn-1").disabled = false;
+          limpiarMsg(1);
+        });
+      });
+
+      autocompleteList.classList.add("open");
+    });
+
+    // Cerrar lista al hacer clic fuera
+    document.addEventListener("click", e => {
+      if (!e.target.closest(".autocomplete-wrap")) {
+        autocompleteList.classList.remove("open");
+      }
+    });
 
     // ── Paso 2: cargar materias ───────────────────────────────
     async function irPaso2() {
-      const docente = document.getElementById("sel-docente").value;
-      const correo  = document.getElementById("inp-correo").value.trim();
-
-      if (!docente || !correo) return;
+      const docente = docenteSeleccionado || inpDocente.value.trim();
+      if (!docente) return;
 
       estado.docente = docente;
-      estado.correo  = correo;
+      estado.correo  = "";
       estado.materia = null;
 
       mostrarPanel(2);
@@ -815,13 +873,14 @@
     // ── Reiniciar ─────────────────────────────────────────────
     function reiniciar() {
       estado = { docente: "", correo: "", materia: null };
-      document.getElementById("inp-correo").value           = "";
-      document.getElementById("inp-fecha-faltada").value    = "";
+      docenteSeleccionado = "";
+      document.getElementById("inp-docente").value            = "";
+      document.getElementById("inp-fecha-faltada").value      = "";
       document.getElementById("inp-fecha-recuperacion").value = "";
-      document.getElementById("sel-docente").value          = "";
-      document.getElementById("btn-1").disabled             = true;
-      document.querySelector(".card .stepper").style.display = "";
-      document.getElementById("panel-exito").style.display  = "none";
+      document.getElementById("btn-1").disabled               = true;
+      autocompleteList.classList.remove("open");
+      document.querySelector(".card .stepper").style.display  = "";
+      document.getElementById("panel-exito").style.display    = "none";
       mostrarPanel(1);
       limpiarMsg(1);
     }
