@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --gold:       #e8a825;
+      --gold:        #e8a825;
       --gold-light: #f7c56d;
       --gold-pale:  #fff8ec;
       --dark:       #1a1209;
@@ -248,7 +248,7 @@
 
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeUp   { from { opacity: 0; transform: translateY(16px);  } to { opacity: 1; transform: translateY(0); } }
-    @keyframes spin     { to { transform: rotate(360deg); } }
+    @keyframes spin      { to { transform: rotate(360deg); } }
     @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 70% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
 
     @media (max-width: 480px) {
@@ -274,7 +274,6 @@
       <div class="step"        id="step-3"><div class="step-num">3</div>Detalles</div>
     </div>
 
-    <!-- Panel 1 -->
     <div class="panel active" id="panel-1">
       <div class="panel-title">Nombre</div>
       <div class="panel-sub">Ingrese su nombre para ver sus materias asignadas.</div>
@@ -293,7 +292,6 @@
       <button class="btn btn-primary" id="btn-1" onclick="irPaso2()" disabled>Continuar →</button>
     </div>
 
-    <!-- Panel 2 -->
     <div class="panel" id="panel-2">
       <div class="panel-title">Materia</div>
       <div class="panel-sub">Seleccione la materia que necesite recuperar.</div>
@@ -308,7 +306,6 @@
       <button class="btn btn-primary" id="btn-2" onclick="irPaso3()" disabled>Continuar →</button>
     </div>
 
-    <!-- Panel 3 -->
     <div class="panel" id="panel-3">
       <div class="panel-title">Detalles de recuperación</div>
       <div class="panel-sub">Confirme los datos y complete la información de la recuperación.</div>
@@ -343,7 +340,6 @@
       <button class="btn btn-primary" id="btn-enviar" onclick="enviar()">Registrar recuperación ✓</button>
     </div>
 
-    <!-- Panel éxito -->
     <div id="panel-exito" style="display:none;">
       <div class="exito-icon">🎉</div>
       <div class="exito-titulo">¡Registrado!</div>
@@ -469,7 +465,10 @@
           card.className     = "materia-card";
           card.dataset.index = i;
           card.innerHTML = `
-            <div class="materia-sigla">${m.sigla}</div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <div class="materia-sigla">${m.sigla}</div>
+              <div style="font-size: 10px; font-weight: 700; color: var(--gold); text-transform: uppercase;">${m.dia}</div>
+            </div>
             <div class="materia-info">
               <div class="materia-nombre">${m.materia}</div>
               <div class="materia-detalle">Paralelo ${m.paralelo} · Aula ${m.aula} · ${m.horario}</div>
@@ -506,6 +505,7 @@
         <div class="resumen-fila"><span class="resumen-label">Docente</span><span class="resumen-valor">${estado.docente}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Correo</span><span class="resumen-valor">${estado.correo}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Materia</span><span class="resumen-valor">${m.sigla} — ${m.materia}</span></div>
+        <div class="resumen-fila"><span class="resumen-label">Día regular</span><span class="resumen-valor">${m.dia}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Paralelo</span><span class="resumen-valor">${m.paralelo}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Aula regular</span><span class="resumen-valor">${m.aula}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Horario regular</span><span class="resumen-valor">${m.horario}</span></div>
@@ -515,7 +515,6 @@
       document.getElementById("inp-fecha-faltada").max      = hoy;
       document.getElementById("inp-fecha-recuperacion").min = hoy;
 
-      // Pre-rellenar con valores regulares como sugerencia
       document.getElementById("inp-horario-recuperacion").value = m.horario;
       document.getElementById("inp-aula-recuperacion").value    = m.aula;
     }
@@ -546,6 +545,7 @@
         sigla             : estado.materia.sigla,
         materia           : estado.materia.materia,
         paralelo          : estado.materia.paralelo,
+        dia               : estado.materia.dia, // <--- ENVIAR DATO DÍA
         aula              : aulaRecuperacion,
         horario           : horarioRecuperacion,
         fechaClaseFaltada : fechaFaltada,
