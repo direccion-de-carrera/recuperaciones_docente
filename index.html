@@ -477,7 +477,10 @@
           card.className     = "materia-card";
           card.dataset.index = i;
           card.innerHTML = `
-            <div class="materia-sigla">${m.sigla}</div>
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
+              <div class="materia-sigla">${m.sigla}</div>
+              <div style="font-size: 10px; font-weight: 700; color: var(--gold); text-transform: uppercase;">${m.dia}</div>
+            </div>
             <div class="materia-info">
               <div class="materia-nombre">${m.materia}</div>
               <div class="materia-detalle">Paralelo ${m.paralelo} · Aula ${m.aula} · ${m.horario}</div>
@@ -514,6 +517,7 @@
         <div class="resumen-fila"><span class="resumen-label">Docente</span><span class="resumen-valor">${estado.docente}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Correo</span><span class="resumen-valor">${estado.correo}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Materia</span><span class="resumen-valor">${m.sigla} — ${m.materia}</span></div>
+        <div class="resumen-fila"><span class="resumen-label">Día regular</span><span class="resumen-valor">${m.dia}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Paralelo</span><span class="resumen-valor">${m.paralelo}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Aula regular</span><span class="resumen-valor">${m.aula}</span></div>
         <div class="resumen-fila"><span class="resumen-label">Horario regular</span><span class="resumen-valor">${m.horario}</span></div>
@@ -554,6 +558,7 @@
         sigla             : estado.materia.sigla,
         materia           : estado.materia.materia,
         paralelo          : estado.materia.paralelo,
+        dia               : estado.materia.dia,
         aula              : aulaRecuperacion,
         horario           : horarioRecuperacion,
         fechaClaseFaltada : fechaFaltada,
